@@ -10,7 +10,7 @@ if myDatabaseDemo.exists():
  print("'{0}' successfully created.\n".format(databaseName))
 
 #CREATE
-def addNewAnswer(question,answer):
+def addNewEntry(question,answer):
     newEntry={
     'question': question,
     'answer': answer,
@@ -19,7 +19,17 @@ def addNewAnswer(question,answer):
     if my_document.exists():
         print('SUCCESS!!')
 
-addNewAnswer("How old is Roshan?","3")
-addNewAnswer("How ugly is Roshan?","10")
+addNewEntry("How old is Roshan?","3")
+addNewEntry("How ugly is Roshan?","10")
 
 #READ
+def readEntry(question):
+    for document in myDatabaseDemo:
+        if (document['question']==question):
+            print(document['answer'])
+            return 0
+
+    print("Answer not found in database")
+
+readEntry("How old is Roshan?")
+readEntry("How smart is Roshan?")
