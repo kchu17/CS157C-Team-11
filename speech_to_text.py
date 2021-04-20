@@ -26,6 +26,12 @@ def record_audio():
             mia_speak('Sorry, my speech service is down')
     return voice_data
 
+def create_json(question):
+    dict = {}
+    dict[question] = ''
+    print(dict.keys())
+    return dict
+
 def mia_speak(audio_string):
     tts = gTTS(text=audio_string, lang='en')
     r = random.randint(1, 1000000) #Generate name for mp3 file
@@ -37,6 +43,7 @@ def mia_speak(audio_string):
 
 print('How can I help you?')
 voice_data = record_audio()
+create_json(voice_data)
 # print(voice_data)
 
 #Setting up Speech to Text Service
