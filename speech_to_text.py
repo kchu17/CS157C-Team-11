@@ -1,8 +1,12 @@
-import ibm_watson
 import speech_recognition as sr
+import playsound
+import os
+import random
+from gtts import gTTS
 from ibm_watson import SpeechToTextV1
 from ibm_watson.websocket import RecognizeCallback, AudioSource 
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+
 
 
 #Speech recognizer
@@ -16,10 +20,20 @@ def record_audio():
             voice_data = r.recognize_google(audio)
             print(voice_data)
         except sr.UnknownValueError:
-            print('Sorry, I did not get that')
+            # print('Sorry, I did not get that')
+            mia_speak(print('Sorry, I did not get that'))
         except sr.RequestError:
-            print('Sorry, my speech service is down')
+            mia_speak('Sorry, my speech service is down')
     return voice_data
+
+def mia_speak(audio_string):
+    tts = gTTS(text=audio_string, lang='en')
+    r = random.randint(1, 1000000) #Generate name for mp3 file
+    audio_file = 'audio-' + str(r) + '.mp3'
+    tts.save(audio_file)
+    playsound.playsound(audio_file)
+    print(audio_string)
+    os.remove(audio_file)
 
 print('How can I help you?')
 voice_data = record_audio()
