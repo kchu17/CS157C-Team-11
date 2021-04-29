@@ -27,8 +27,8 @@ addNewEntry("What is the unit conversion from pounds to kilograms?","One pound i
 addNewEntry("How much sugar is in a can of coke?","39 grams of sugar")
 addNewEntry("Is the United States more populated than Russia?","Yes, the United States has approximately 330 million people while Russia has approximately 145 million.")
 addNewEntry("Whats Standford University's Acceptance Rate?","4.3%")
-addNewEntry("Is Pluto still a planet?","No, it was deemed a dwarf planet in 2006")
-addNewEntry("What NBA team has the most championships?","The LA Lakers and the Boston Celtics are currently tied for the most championships with 17 each. ")
+addNewEntry("Is Pluto still a planet?","Yes, it is one one the nine planets")
+addNewEntry("What NBA team has the most championships?","The Boston Celtics are currently have the most championships with 17")
 
 #READ
 def readEntry(question):
@@ -49,3 +49,24 @@ readEntry("Is the United States more populated than Russia?")
 readEntry("Whats Standford University's Acceptance Rate?")
 readEntry("Is Pluto still a planet?")
 readEntry("What NBA team has the most championships?")
+
+#UPDATE
+def updateEntry(question, newAnswer):
+    for document in myDatabaseDemo:
+        if (document['question']==question):
+            document['answer'] == newAnswer
+            return 0
+
+    print("Question not found in database")
+
+updateEntry("Is Pluto still a planet?" , "No, it was deemed a dwarf planet in 2006")
+updateEntry("What NBA team has the most championships?","The LA Lakers and the Boston Celtics are currently tied for the most championships with 17 each")
+
+#DELETE
+def delete(question):
+    for document in myDatabaseDemo:
+        if (document['question']==question):
+            myDatabaseDemo.delete(document)
+            return 0
+
+    print("Question not found in database")
