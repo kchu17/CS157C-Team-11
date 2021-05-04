@@ -3,6 +3,7 @@ import playsound
 import os
 import random
 from gtts import gTTS
+from time import ctime
 from ibm_watson import SpeechToTextV1
 from ibm_watson.websocket import RecognizeCallback, AudioSource 
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
@@ -16,6 +17,11 @@ def mia_speak(audio_string):
     print(audio_string)
     os.remove(audio_file)
 
-string = 'Hello World'
-mia_speak(string)
-print(string)
+def respond(voice_data):
+    if 'what time is it' in voice_data:
+        mia_speak(ctime())
+
+
+# string = 'Hello World'
+# mia_speak(string)
+# print(string)
