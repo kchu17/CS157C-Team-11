@@ -2,71 +2,75 @@ from cloudant.client import Cloudant
 from cloudant.error import CloudantException
 from cloudant.result import Result, ResultByKey
 
-client = Cloudant.iam("dcc9e7a6-300c-48bc-a169-3b153750d14a-bluemix", "ok15p-S7RlG8WsXUDBKLVFyWPtzneRXP8kshX1eRjWUx", connect=True)
+client = Cloudant.iam("685542ea-039d-4fbb-a0f3-58372ca5e9da-bluemix", "i2yZ76A-jB0eXT0SGcvsfpjS3GH_-u_z2jAu_LtDZngP", connect=True)
 
-databaseName = "databaseMIA"
+databaseName = "databasedemo"
 myDatabaseDemo = client.create_database(databaseName)
 if myDatabaseDemo.exists():
- print("'{0}' successfully created.\n".format(databaseName))
+    print("'{0}' successfully created.\n".format(databaseName))
+
+keywords={"time","today","yesterday","now","temperature"}
+
+#break question into words
+def makeWordArray(question):
+    arr=question.split();
+    return arr
 
 #CREATE
 def addNewEntry(question,answer):
+    wordArray=makeWordArray(question)
+    containsKeywords=False
+    for i in wordArray:
+        if(i.lower() in keywords):
+            containsKeywords=True
     newEntry={
     'question': question,
     'answer': answer,
+    'needsUpdate':containsKeywords
     }
     my_document = myDatabaseDemo.create_document(newEntry)
     if my_document.exists():
         print('SUCCESS!!')
 
-addNewEntry("How old is Joe Biden?","78")
-addNewEntry("Whats the mascot for SJSU?","Sammy the Spartan")
-addNewEntry("Who is the CEO of Apple?","Tim Cook")
-addNewEntry("How many cups are in a gallon?","16")
-addNewEntry("What is the unit conversion from pounds to kilograms?","One pound is 2.2 kilograms")
-addNewEntry("How much sugar is in a can of coke?","39 grams of sugar")
-addNewEntry("Is the United States more populated than Russia?","Yes, the United States has approximately 330 million people while Russia has approximately 145 million.")
-addNewEntry("Whats Standford University's Acceptance Rate?","4.3%")
-addNewEntry("Is Pluto still a planet?","Yes, it is one one the nine planets")
-addNewEntry("What NBA team has the most championships?","The Boston Celtics are currently have the most championships with 17")
-
-#READ
-def readEntry(question):
-    for document in myDatabaseDemo:
-        if (document['question']==question):
-            print(document['answer'])
-            return 0
-
-    print("Answer not found in database")
-
-readEntry("How old is Joe Biden?")
-readEntry("Whats the mascot for SJSU?")
-readEntry("Who is the CEO of Apple?")
-readEntry("How many cups are in a gallon?")
-readEntry("What is the unit conversion from pounds to kilograms?")
-readEntry("How much sugar is in a can of coke?")
-readEntry("Is the United States more populated than Russia?")
-readEntry("Whats Standford University's Acceptance Rate?")
-readEntry("Is Pluto still a planet?")
-readEntry("What NBA team has the most championships?")
-
-#UPDATE
 def updateEntry(question, newAnswer):
     for document in myDatabaseDemo:
         if (document['question']==question):
-            document['answer'] == newAnswer
+            mydoc=document
+            mydoc['question']=question
+            mydoc['answer']=newAnswer
+            mydoc['needsUpdate']=document['needsUpdate']
+            mydoc.save()
             return 0
-
     print("Question not found in database")
 
-updateEntry("Is Pluto still a planet?" , "No, it was deemed a dwarf planet in 2006")
-updateEntry("What NBA team has the most championships?","The LA Lakers and the Boston Celtics are currently tied for the most championships with 17 each")
+
+def readEntry(question):
+    for document in myDatabaseDemo:
+        if (document['question'] == question):
+            if(document['needsUpdate']):
+                mydoc=document
+                mydoc['question']=question
+                mydoc['answer']="6:00pm"
+                mydoc['needsUpdate']=document['needsUpdate']
+                mydoc.save()
+            print(document['answer'])
+            return 0
+    print("Answer not found in database")
+
+addNewEntry("Is Pluto still a planet?","Yes, it is one one the nine planets")
+addNewEntry("What NBA team has the most championships?","The Boston Celtics are currently have the most championships with 17")
+addNewEntry("Whats the time right now in California?", "5:00pm")
+readEntry("Whats the time right now in California?")
+
+#UPDATE
+updateEntry("Is Pluto still a planet?","no")
 
 #DELETE
-def delete(question):
+def deleteEntry(question):
     for document in myDatabaseDemo:
-        if (document['question']==question):
-            myDatabaseDemo.delete(document)
+        if (document['question']== question):
+            document.delete()
             return 0
-
     print("Question not found in database")
+
+deleteEntry("Whats the time right now in California?")
