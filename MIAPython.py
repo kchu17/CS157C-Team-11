@@ -18,33 +18,56 @@ def makeWordArray(question):
     arr=question.split()
     return arr
 
+#Get the keys from a dictionary
+def get_key(val, dict):
+    for key, value in dict.items():
+         if val == value:
+             return key
+    return "key doesn't exist"
+
 #CREATE
-def addNewEntry(question,answer):
+def addNewEntry(question, answer, *args, **kwargs):
     wordArray=makeWordArray(question)
     containsKeywords=False
     for i in wordArray:
         if(i.lower() in keywords):
             containsKeywords=True
-    newEntry={
-    'question': question,
-    'answer': answer,
-    'needsUpdate':containsKeywords,
-    'frequency': 1
-    }
+    if len(args) > 0 or len(kwargs) > 0:
+        newEntry={
+            'question': question,
+            'answer': answer,
+            'needsUpdate':containsKeywords,
+            'frequency': 1,
+            'details': args[0]
+        }
+    else:
+        newEntry={
+        'question': question,
+        'answer': answer,
+        'needsUpdate':containsKeywords,
+        'frequency': 1
+        }
     my_document = myDatabaseDemo.create_document(newEntry)
     if my_document.exists():
         print('SUCCESS!!')
 
 
 #UPDATE
-def updateEntry(question, newAnswer):
+def updateEntry(question, newAnswer, *args, **kwargs):
     for document in myDatabaseDemo: #Searches the collection for the matching question
         if (document['question']==question): 
             mydoc=document
             mydoc['question']=question
             mydoc['answer']=newAnswer
             mydoc['needsUpdate']=document['needsUpdate'] #Can this be left out?
-            mydoc['frequency']=document['frequency'] + 1
+            mydoc['frequency']= document['frequency'] + 1
+            if len(args) > 0 or len(kwargs) > 0:
+                mydoc=document
+                mydoc['question']=question
+                mydoc['answer']=newAnswer
+                mydoc['needsUpdate']=document['needsUpdate'] #Can this be left out?
+                mydoc['frequency']=document['frequency'] + 1
+                mydoc['details'] = args[0]
             mydoc.save()
             return 0
     print("Question not found in database")
@@ -94,7 +117,7 @@ def readEntry(question):
             mydoc['needsUpdate']=document['needsUpdate']
             mydoc['frequency']=document['frequency']
             mydoc.save()
-            return 0
+            return document['answer']
     print("Answer not found in database")
 
 
