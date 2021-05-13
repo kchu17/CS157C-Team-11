@@ -3,7 +3,8 @@ import playsound
 import os
 import random
 import time
-from MIAPython import addNewEntry, readEntry
+import wolframalpha
+from MIAPython import addNewEntry, readEntry, mostFrequent, existing_question, updateEntry, deleteEntry
 from time import ctime
 from gtts import gTTS
 from ibm_watson import SpeechToTextV1
@@ -14,7 +15,8 @@ from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 
 #Speech recognizer
 r = sr.Recognizer()
-entry = {"question":"", "answer":""}
+client = wolframalpha.Client('2E922Y-48JVAHYP2H')
+entry = {"question":"", "answer":"","needsUpdate":"","frequency":""}
 
 def record_audio():
     with sr.Microphone() as source:
@@ -46,33 +48,86 @@ def mia_speak(audio_string):
     audio_file = 'audio-' + str(r) + '.mp3'
     tts.save(audio_file)
     playsound.playsound(audio_file)
-    print(audio_string)
+    # print(audio_string)
     os.remove(audio_file)
 
+def ask_wolfram(voice_data):
+    question = client.query(voice_data)
+    output = next(question.results).text
+    return output
+
 def respond(voice_data):
-    if 'what time is it' in voice_data:
+    if 'what is your name' in voice_data:
+        name = 'My name is MIA'
+        mia_speak(name)
+        entry.update({"answer": name})
+        if existing_question(voice_data) == True:
+            updateEntry(entry['question'], entry['answer'])
+            readEntry(entry['question'])
+        else:
+            addNewEntry(entry['question'], entry['answer'])
+            readEntry(entry['question'])
+    # if 'population' in voice_data: #For california atm
+    #     answer = ask_wolfram(voice_data)
+    #     mia_speak(answer)
+    #     entry.update({"answer": answer})
+    elif 'what is the most common question' in voice_data:
+        x = mostFrequent()
+        mia_speak(x)
+        entry.update({"answer": x})
+        if existing_question(voice_data) == True:
+            updateEntry(entry['question'], entry['answer'])
+            readEntry(entry['question'])
+        else:
+            addNewEntry(entry['question'], entry['answer'])
+            readEntry(entry['question'])
+        #entry updatE?
+    elif 'what is the time' in voice_data:
         x = ctime()
         mia_speak(x)
         entry.update({"answer": x})
-    if 'exit' in voice_data:
+        if existing_question(voice_data) == True:
+            updateEntry(entry['question'], entry['answer'])
+            readEntry(entry['question'])
+        else:
+            addNewEntry(entry['question'], entry['answer'])
+            readEntry(entry['question'])
+    elif 'exit' in voice_data:
         exit()
+    else: #General Question
+        # answer = ask_wolfram(voice_data)
+        # mia_speak(answer)
+        # entry.update({"answer": answer})
+        # if existing_question(voice_data) == True:
+        #     updateEntry(entry['question'], entry['answer'])
+        #     readEntry(entry['question'])
+        # else:
+        #     addNewEntry(entry['question'], entry['answer'])
+        #     readEntry(entry['question'])
+        # updateEntry(entry['question'], entry['answer'])
+        if existing_question(voice_data) ==  True:
+            old_answer = readEntry(entry['question'])
+            entry.update({"answer": old_answer})
+            answer = readEntry(entry['question'])
+            mia_speak(answer)
+            updateEntry(entry['question'], entry['answer'])
+            readEntry(entry['question'])
+        else:
+            answer = ask_wolfram(voice_data)
+            mia_speak(answer)
+            entry.update({"answer": answer})
+            addNewEntry(entry['question'], entry['answer'])
+            readEntry(entry['question'])
+
+if __name__ == "__main__":
+    time.sleep(1)
+    mia_speak('How can I help you?')
+    while 1:
+        voice_data = record_audio()
+        respond(voice_data)
 
 
 
-time.sleep(1)
-mia_speak('How can I help you?')
-while 1:
-    voice_data = record_audio()
-    # addNewEntry = (entry[0], entry[1])
-    # print(entry)
-    # addNewEntry(voice_data,
-    respond(voice_data)
-    print(entry)
-
-
-# print('How can I help you?')
-# voice_data = record_audio()
-# create_json(voice_data)
 
 
 # print(voice_data)
