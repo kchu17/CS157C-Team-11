@@ -11,8 +11,6 @@ from ibm_watson import SpeechToTextV1
 from ibm_watson.websocket import RecognizeCallback, AudioSource 
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 
-
-
 #Speech recognizer
 r = sr.Recognizer()
 client = wolframalpha.Client('2E922Y-48JVAHYP2H')
@@ -39,9 +37,6 @@ def create_json(question):
     # print(dict.keys())
     return dict
 
-def scan_db(question):
-    return None
-
 def mia_speak(audio_string):
     tts = gTTS(text=audio_string, lang='en')
     r = random.randint(1, 1000000) #Generate name for mp3 file
@@ -56,6 +51,16 @@ def ask_wolfram(voice_data):
     output = next(question.results).text
     return output
 
+#Extracts a subset dictionary of time
+def extract_time_info(time):
+    time_info = {'Day':'', 'Month':'', 'Day of Month':'','Time':'','Year':''}
+    time_info['Day'] = time[0]
+    time_info['Month'] = time[1]
+    time_info['Day of Month'] = time[2]
+    time_info['Time'] = time[3]
+    time_info['Year'] = time[4]
+    return time_info
+
 def respond(voice_data):
     if 'what is your name' in voice_data:
         name = 'My name is MIA'
@@ -67,10 +72,6 @@ def respond(voice_data):
         else:
             addNewEntry(entry['question'], entry['answer'])
             readEntry(entry['question'])
-    # if 'population' in voice_data: #For california atm
-    #     answer = ask_wolfram(voice_data)
-    #     mia_speak(answer)
-    #     entry.update({"answer": answer})
     elif 'what is the most common question' in voice_data:
         x = mostFrequent()
         mia_speak(x)
@@ -84,13 +85,16 @@ def respond(voice_data):
         #entry updatE?
     elif 'what is the time' in voice_data:
         x = ctime()
+        split_time = x.split()
         mia_speak(x)
-        entry.update({"answer": x})
+        broken_time = extract_time_info(split_time)
+        entry.update({"answer": x, "details": broken_time})
+        print(entry)
         if existing_question(voice_data) == True:
-            updateEntry(entry['question'], entry['answer'])
+            updateEntry(entry['question'], entry['answer'], entry['details'])
             readEntry(entry['question'])
         else:
-            addNewEntry(entry['question'], entry['answer'])
+            addNewEntry(entry['question'], entry['answer'], entry['details'])
             readEntry(entry['question'])
     elif 'exit' in voice_data:
         exit()
@@ -108,10 +112,8 @@ def respond(voice_data):
         if existing_question(voice_data) ==  True:
             old_answer = readEntry(entry['question'])
             entry.update({"answer": old_answer})
-            answer = readEntry(entry['question'])
-            mia_speak(answer)
+            mia_speak(old_answer)
             updateEntry(entry['question'], entry['answer'])
-            readEntry(entry['question'])
         else:
             answer = ask_wolfram(voice_data)
             mia_speak(answer)

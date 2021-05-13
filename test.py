@@ -1,10 +1,11 @@
 import speech_recognition as sr
 import playsound
 import os
+from time import ctime
 import random
 import time
 from speech_to_text import mia_speak
-from MIAPython import readEntry, existing_question, updateEntry, addNewEntry
+# from MIAPython import readEntry, existing_question, updateEntry, addNewEntry
 import wolframalpha
 from flask import Flask, request, url_for, session
 from twilio.twiml.voice_response import VoiceResponse, Record, Gather
@@ -26,8 +27,34 @@ from twilio.twiml.voice_response import VoiceResponse, Record, Gather
 # answer2 = 'Barrack Obama'
 
 # print(existing_question(question))
-string = 'George W. Bush (from January 20, 2001 to January 20, 2009)'
-mia_speak(string)
+# x = ctime()
+# print(type(x))
+# print(x)
+# arr=x.split()
+# print(arr)
+
+# def func(*args):
+#     # *args means for however many arguments you take in, it will catch them all
+#     print(args[0])
+#     # for arg in args:
+#     #     print(arg)
+#     print(len(args))
+# l = [11,3,4,5,"tuts"]
+ 
+# print(func(*l))
+def concatenate(**words):
+    print(words.get('a'))
+    print(words.keys())
+    # print(words.values()[0])
+    # result = ""
+    # for arg in words.values():
+    #     result += arg
+    # return result
+
+print(concatenate(a="Real", b="Python", c="Is", d="Great", e="!"))
+
+
+
 # print(existing_question(question3))
 
 
