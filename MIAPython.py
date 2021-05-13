@@ -2,7 +2,7 @@ from cloudant.client import Cloudant
 from cloudant.error import CloudantException
 from cloudant.result import Result, ResultByKey
 
-client = Cloudant.iam("685542ea-039d-4fbb-a0f3-58372ca5e9da-bluemix", "J_VIN6hP17Zu5r4rUUGesjutWnRPrbie9BT1Z4O-Unvj", connect=True)
+client = Cloudant.iam("dcc9e7a6-300c-48bc-a169-3b153750d14a-bluemix", "ok15p-S7RlG8WsXUDBKLVFyWPtzneRXP8kshX1eRjWUx", connect=True)
 
 databaseName = "databasedemo"
 myDatabaseDemo = client.create_database(databaseName)
