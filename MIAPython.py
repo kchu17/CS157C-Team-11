@@ -2,7 +2,7 @@ from cloudant.client import Cloudant
 from cloudant.error import CloudantException
 from cloudant.result import Result, ResultByKey
 
-client = Cloudant.iam("685542ea-039d-4fbb-a0f3-58372ca5e9da-bluemix", "i2yZ76A-jB0eXT0SGcvsfpjS3GH_-u_z2jAu_LtDZngP", connect=True)
+client = Cloudant.iam("685542ea-039d-4fbb-a0f3-58372ca5e9da-bluemix", "J_VIN6hP17Zu5r4rUUGesjutWnRPrbie9BT1Z4O-Unvj", connect=True)
 
 databaseName = "databasedemo"
 myDatabaseDemo = client.create_database(databaseName)
@@ -26,12 +26,13 @@ def addNewEntry(question,answer):
     newEntry={
     'question': question,
     'answer': answer,
-    'needsUpdate':containsKeywords
+    'needsUpdate':containsKeywords,
+    'frequency': 1
     }
     my_document = myDatabaseDemo.create_document(newEntry)
     if my_document.exists():
         print('SUCCESS!!')
-
+#UPDATE
 def updateEntry(question, newAnswer):
     for document in myDatabaseDemo:
         if (document['question']==question):
@@ -39,11 +40,12 @@ def updateEntry(question, newAnswer):
             mydoc['question']=question
             mydoc['answer']=newAnswer
             mydoc['needsUpdate']=document['needsUpdate']
+            mydoc['frequency']=document['frequency']
             mydoc.save()
             return 0
     print("Question not found in database")
 
-
+#READ
 def readEntry(question):
     for document in myDatabaseDemo:
         if (document['question'] == question):
@@ -52,8 +54,17 @@ def readEntry(question):
                 mydoc['question']=question
                 mydoc['answer']="6:00pm"
                 mydoc['needsUpdate']=document['needsUpdate']
+                mydoc['frequency']=document['frequency'] + 1
                 mydoc.save()
+                print(document['answer'])
+                return 0
             print(document['answer'])
+            mydoc=document
+            mydoc['question']=question
+            mydoc['answer']=document['answer']
+            mydoc['needsUpdate']=document['needsUpdate']
+            mydoc['frequency']=document['frequency'] + 1
+            mydoc.save()
             return 0
     print("Answer not found in database")
 
@@ -62,7 +73,7 @@ addNewEntry("What NBA team has the most championships?","The Boston Celtics are 
 addNewEntry("Whats the time right now in California?", "5:00pm")
 readEntry("Whats the time right now in California?")
 
-#UPDATE
+
 updateEntry("Is Pluto still a planet?","no")
 
 #DELETE
@@ -73,4 +84,15 @@ def deleteEntry(question):
             return 0
     print("Question not found in database")
 
-deleteEntry("Whats the time right now in California?")
+#FREQUECY
+def mostFrequent():
+    mydoc=None
+    max=0
+    for document in myDatabaseDemo:
+        if document['frequency'] > max:
+            max=document['frequency']
+            mydoc=document
+    print(mydoc['question'])
+    return mydoc
+
+mostFrequent()
